@@ -123,6 +123,8 @@
 
   /* ---- SECTIONS ---- */
   section.block{position:relative;padding:clamp(70px,10vw,130px) 0}
+  /* Offset fixed nav on anchor scroll — applies on mobile where nav is visible */
+  #story,#services,#gallery,#reviews,#visit{scroll-margin-top:72px}
   .lift{margin-top:-50px;background:var(--ivory);border-radius:40px 40px 0 0;position:relative;z-index:10;box-shadow:0 -38px 72px -36px rgba(44,35,25,.5)}
   .reveal{opacity:0;transform:translateY(28px);transition:opacity .85s ease,transform .85s cubic-bezier(.2,.8,.2,1)}
   .reveal.in{opacity:1;transform:none}
