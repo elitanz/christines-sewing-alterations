@@ -85,6 +85,8 @@
   body.menu-open .nav-toggle span:nth-child(2){opacity:0}
   body.menu-open .nav-toggle span:nth-child(3){transform:translate(-50%,-50%) rotate(-45deg)}
   @media(max-width:760px){
+    /* On mobile the nav bar is always visible from the top (desktop keeps the slide-in) */
+    .nav{transform:none;opacity:1;border-bottom-color:var(--line)}
     .nav-toggle{display:flex;align-items:center;justify-content:center}
     .nav-links{position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;
       background:#fff;border-top:1px solid var(--blush);box-shadow:0 28px 54px -18px rgba(44,35,25,.35);
@@ -239,7 +241,7 @@
   <section class="scrollhero" id="scrollHero">
     <div class="stage" id="stage">
       <canvas id="frameCanvas"></canvas>
-      <video id="heroVideo" src="hero.mp4" poster="poster.jpg" muted loop playsinline preload="none"></video>
+      <video id="heroVideo" poster="poster.jpg" muted autoplay loop playsinline webkit-playsinline preload="none"></video>
       <img id="heroPoster" src="poster.jpg" alt="A seamstress carefully measuring a bridal gown" />
       <div class="stage-overlay"></div>
 
@@ -471,7 +473,20 @@
     document.body.classList.add("fallback");
     cap1.style.opacity=1;
     if(reduce){ document.body.classList.add("show-poster"); }
-    else { document.body.classList.add("show-video"); video.play().catch(function(){}); }
+    else {
+      document.body.classList.add("show-video");
+      // Mobile gets a lean ~720p encode so it buffers and autoplays fast.
+      var isSmall = window.matchMedia("(max-width:767px)").matches;
+      video.src = isSmall ? "hero-mobile.mp4" : "hero.mp4";
+      video.muted = true; video.setAttribute("muted","");
+      var tryPlay = function(){ var p = video.play(); if(p&&p.catch) p.catch(function(){}); };
+      tryPlay();
+      // iOS can block muted autoplay (Low Power Mode); retry on first user gesture.
+      var kick = function(){ tryPlay(); };
+      ["touchstart","scroll","click"].forEach(function(ev){
+        window.addEventListener(ev, kick, {passive:true, once:true});
+      });
+    }
     if(loadNote) loadNote.style.display="none";
     if(startCue) startCue.style.opacity=0;
     window.addEventListener("scroll",function(){
